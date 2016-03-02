@@ -239,11 +239,6 @@ def EB2__erle_brain__get_orientation(ow_,ox_,oy_,oz_):
     import rosnode
     from sensor_msgs.msg import Imu
 
-    global ow
-    global ox
-    global oy
-    global oz
-
     print("EB2__erle_brain__get_orientation w/ params:"+ow_+ox_+oy_+oz_)
     ros_nodes = rosnode.get_node_names()
     if not '/imu_talker' in ros_nodes:
@@ -251,17 +246,36 @@ def EB2__erle_brain__get_orientation(ow_,ox_,oy_,oz_):
         process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE)
     msg_imu = rospy.wait_for_message('/imu9250', Imu, timeout=1)
   
-    ow_ = msg_imu.orientation.w
-    ox_ = msg_imu.orientation.x
-    oy_ = msg_imu.orientation.y
-    oz_ = msg_imu.orientation.z
- 
-    ow = ow_
-    ox = ox_
-    oy = oy_
-    oz = oz_
 
-    print(type(ow))
+    #create float variable with name from string python
+    name_w = ow_
+    name_x = ox_
+    name_y = oy_
+    name_z = oz_
+    imu_w = msg_imu.orientation.w
+    imu_x = msg_imu.orientation.x
+    imu_y = msg_imu.orientation.y
+    imu_z = msg_imu.orientation.z
+    
+    '''eval("global "+name_w)
+    del globals()[name_w]
+    print("deleted")'''
+    #eval("global "+name_w)
+
+    print(name_w)
+    print(imu_w)
+
+    exec("global %s; %s = %f" % (name_w, name_w , imu_w))
+    exec("%s = %f" % (name_x , imu_x))
+    exec("%s = %f" % (name_y , imu_y))
+    exec("%s = %f" % (name_z , imu_z))
+    
+    print("TESTS")
+
+    print(name_w+"="+str(eval(name_w)))
+
+    print("adding global")
+    #eval("global "+name_w)
 
 def callback(data):
     rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.data)
